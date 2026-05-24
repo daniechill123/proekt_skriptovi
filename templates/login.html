@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang ="bg">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Вход- електронен дневник</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+
+    <body>
+        <div class="auth-container">
+        <h2>Добре дошли</h2>
+        <p>Влезте в електронния дневник</p>
+        
+        <form method="POST" action="/login">
+            <div class="input-group">
+                <label>Имейл адрес</label>
+                <input type="email" name="email" placeholder="example@school.bg" required>
+            </div>
+            <div class="input-group">
+                <label>Парола</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="auth-btn btn-login">Вход</button>
+        </form>
+
+        <div class="switch-text">
+            Нямате профил? <a href="/register" class="link-login">Регистрирайте се тук</a>
+        </div>
+    </div>
+
+</body>
+</html>

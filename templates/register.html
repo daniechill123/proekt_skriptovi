@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="bg">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Регистрация - Електронен Дневник</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+
+    <div class="auth-container">
+        <h2>Създай профил</h2>
+        <p>Регистрирайте се в системата</p>
+        
+        <form method="POST" action="/register">
+            <div class="input-group">
+                <label>Име и Фамилия</label>
+                <input type="text" name="name" placeholder="Иван Иванов" required>
+            </div>
+
+            <div class="input-group">
+                <label>Имейл адрес</label>
+                <input type="email" name="email" placeholder="ivan@school.bg" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Парола</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="input-group">
+                <label>Тип потребител</label>
+                <select name="role">
+                    <option value="student">Ученик</option>
+                    <option value="teacher">Учител</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="auth-btn btn-register">Регистрация</button>
+        </form>
+
+        <div class="switch-text">
+            Вече имате профил? <a href="/login" class="link-register">Влезте оттук</a>
+        </div>
+    </div>
+
+</body>
+</html>
