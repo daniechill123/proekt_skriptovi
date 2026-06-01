@@ -4,47 +4,41 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Активиране на профил - Дневник</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="/static/css/style.css">
     </head>
     <body>
-
-    <div class="auth-container">
-        <h2>Активиране на профил</h2>
-        
-            <form method="POST" action="/register">
+        <div class="auth-container">
+            <h2>Активиране на профил</h2>
+            <form id="register-form">
                 <div class="input-group">
                     <label>Име и Фамилия</label>
-                    <input type="text" name="name" required>
+                    <input type="text" id="register-name" required>
                 </div>
-
                 <div class="input-group">
                     <label>Имейл адрес</label>
-                    <input type="email" name="email" required>
+                    <input type="email" id="register-email" required>
                 </div>
-            
                 <div class="input-group">
                     <label>Парола</label>
-                    <input type="password" name="password" placeholder="••••••••" required>
+                    <input type="password" id="register-password" placeholder="••••••••" required>
                 </div>
-
                 <div class="input-group">
                     <label>Тип потребител</label>
-                    <select name="role">
+                    <select id="register-role">
                         <option value="student">Ученик</option>
                         <option value="teacher">Учител</option>
                     </select>
-             </div>
-            
+                </div>
                 <button type="submit" class="auth-btn">Регистрация</button>
             </form>
-
             <div class="switch-text">
-            <a href="/login">Нямате профил? За да създадете<br>нов кликнете тук!</a>
+                <a href="/static/html/login.html">Имате профил? За да влезете<br>кликнете тук!</a>
             </div>
-     </div>
+        </div>
         <div class="footer">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Лого">
+            <img src="/static/images/LOGO.png" alt="Лого">
             Дневник
         </div>
+        <script src="/static/popup.js"></script>
     </body>
 </html>

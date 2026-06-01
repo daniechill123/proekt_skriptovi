@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дневник - Ученик</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <button class="year-btn active" onclick="switchYear('2025-2026', this)">учебна година: 2025-2026</button>
+            <button class="year-btn" onclick="switchYear('2026-2027', this)">учебна година: 2026-2027</button>
+        </aside>
+        <main class="grades-area">
+            <div id="year-2025-2026" class="table-container">
+                <table class="grades-table">
+                    <thead>
+                        <tr>
+                            <th>Учебна година 2025-2026</th>
+                            <th>ТЕКУЩИ</th>
+                            <th>СРОЧНА</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="subject-cell">Английски език / ООП - Перуника Кършакова</td>
+                            <td>
+                                <span class="grade grade-6">6</span>
+                                <span class="grade grade-5">5</span>
+                            </td>
+                            <td><span class="grade grade-5">5</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="year-2026-2027" class="table-container hidden">
+                <table class="grades-table">
+                    <thead>
+                        <tr>
+                            <th>Учебна година 2026-2027</th>
+                            <th>ТЕКУЩИ</th>
+                            <th>СРОЧНА</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="subject-cell">Математика / ООП - Лидия Иванова</td>
+                            <td>
+                                <span class="grade grade-4">4</span>
+                                <span class="grade grade-4">4</span>
+                            </td>
+                            <td><span class="grade grade-4">4</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <div class="footer">
+        <img src="/static/images/LOGO.png" alt="Лого">
+        Дневник
+    </div>
+    <script>
+    function switchYear(yearId, buttonElement) {
+        document.querySelectorAll('.table-container').forEach(table => {
+            table.classList.add('hidden');
+        });
+        document.getElementById('year-' + yearId).classList.remove('hidden');
+
+        document.querySelectorAll('.year-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        buttonElement.classList.add('active');
+    }
+    </script>
+    <script src="/static/popup.js"></script>
+</body>
+</html>
