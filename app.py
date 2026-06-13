@@ -1,13 +1,52 @@
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import secrets
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:TVOIATA_PAROLA@localhost/school_diary'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class Class(db.Model):
+    __tablename__ = 'classes'
+    id = db.Column(db.Integer, primary_key=True)
+    grade = db.Column(db.Integer, nullable=False)
+    letter = db.Column(db.String(10), nullable=False)
+    users = db.relationship('User', backref='assigned_class', lazy=True)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=True)
+    token = db.Column(db.String(255), nullable=True)
+
+@app.route('/')
+def index():
+    return app.send_static_file('html/login.html')
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    if not data or 'email' not in data or 'password' not in data or 'role' not in data:
-        return jsonify({"error": "Missing parameters"}), 400
+    if not data or not all(k in data for k in ('name', 'email', 'password', 'role')):
+        return jsonify({"error": "Missing data"}), 400
     
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({"error": "Email already exists"}), 400
+
+    new_user = User(
+        name=data['name'],
+        email=data['email'],
+        password=data['password'],
+        role=data['role']
+    )
+    db.session.add(new_user)
+    db.session.commit()
     return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/sign-in', methods=['POST'])
@@ -15,53 +54,23 @@ def sign_in():
     data = request.get_json()
     if not data or 'email' not in data or 'password' not in data:
         return jsonify({"error": "Invalid input"}), 400
-    
-    if data['email'] == "student@school.bg" and data['password'] == "123456":
-        return jsonify({"token": "student-token-xyz", "role": "student"}), 200
-    elif data['email'] == "teacher@school.bg" and data['password'] == "123456":
-        return jsonify({"token": "teacher-token-xyz", "role": "teacher"}), 200
-        
-    return jsonify({"error": "Unauthorized"}), 401
+
+    user = User.query.filter_by(email=data['email'], password=data['password']).first()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user.token = secrets.token_hex(16)
+    db.session.commit()
+    return jsonify({"token": user.token, "role": user.role}), 200
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    return "", 204
-
-@app.route('/grades', methods=['GET'])
-def get_grades():
-    auth_header = request.headers.get('Authorization')
-    if not auth_header:
-        return jsonify({"error": "Unauthorized"}), 401
-        
-    mock_grades = [
-        {"id": 1, "subject": "Английски език", "term_1_current": [6, 5], "term_1_final": 5, "term_2_current": [6], "term_2_final": None}
-    ]
-    return jsonify(mock_grades), 200
-
-@app.route('/grades', methods=['POST'])
-def create_grade():
-    auth_header = request.headers.get('Authorization')
-    if not auth_header:
-        return jsonify({"error": "Unauthorized"}), 401
-    if "teacher" not in auth_header:
-        return jsonify({"error": "Forbidden"}), 403
-        
-    data = request.get_json()
-    if not data or 'subject_id' not in data or 'value' not in data:
-        return jsonify({"error": "Bad Request"}), 400
-        
-    new_grade = {"id": 100, "subject_id": data['subject_id'], "value": data['value']}
-    return jsonify(new_grade), 201
-
-@app.route('/grades/<int:grade_id>', methods=['PUT'])
-def update_grade(grade_id):
-    data = request.get_json()
-    if not data or 'value' not in data:
-        return jsonify({"error": "Bad Request"}), 400
-    return jsonify({"id": grade_id, "value": data['value']}), 200
-
-@app.route('/grades/<int:grade_id>', methods=['DELETE'])
-def delete_grade(grade_id):
+    auth_token = request.headers.get('Authorization')
+    if auth_token:
+        user = User.query.filter_by(token=auth_token).first()
+        if user:
+            user.token = None
+            db.session.commit()
     return "", 204
 
 if __name__ == '__main__':
