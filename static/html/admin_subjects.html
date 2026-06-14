@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ - Предмети</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <div class="admin-container">
+        <h1 class="admin-title">ADMIN</h1>
+
+        <div class="nav-container">
+            <a href="/admin/users" class="nav-box">Потребители</a>
+            <a href="/admin/classes" class="nav-box">Класове</a>
+            <a href="/admin/subjects" class="nav-box active">Предмети(активен)</a>
+        </div>
+
+        <div class="table-container">
+            <table class="wireframe-table">
+                <thead>
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Преподавател</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="subjects-table-body">
+                    <tr>
+                        <td>Математика</td>
+                        <td>Петър Петров</td>
+                        <td class="action-icons">
+                            <span class="edit-icon" title="Редактирай">✏️</span>
+                            <span class="delete-icon" title="Изтрий">🗑️</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/js/admin_subjects.js"></script>
+</body>
+</html>

@@ -614,3 +614,82 @@ body.admin-page-body {
     background-size: 20px;
     padding-right: 40px;
 }
+
+.admin-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.admin-title {
+    text-align: center;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 48px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.nav-box {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    margin: 0 15px;
+    border: 3px solid black;
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: white;
+}
+
+.nav-box:hover {
+    background-color: #f0f0f0;
+}
+
+.nav-box.active {
+    box-shadow: inset 0 0 0 1px black;
+}
+
+.table-container {
+    height: 400px;
+    overflow-y: auto;
+    border-top: 3px solid black;
+    border-bottom: 3px solid black;
+}
+
+.wireframe-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.wireframe-table th, 
+.wireframe-table td {
+    border: 1px solid black;
+    padding: 15px;
+    font-size: 18px;
+}
+
+.wireframe-table th {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 22px;
+    border-bottom: 3px solid black;
+}
+
+.action-icons {
+    text-align: center;
+    letter-spacing: 15px;
+    cursor: pointer;
+}
+
+.edit-icon, .delete-icon {
+    font-size: 20px;
+}

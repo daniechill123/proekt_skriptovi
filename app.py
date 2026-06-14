@@ -26,6 +26,20 @@ class User(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=True)
     token = db.Column(db.String(255), nullable=True)
 
+class Subject(db.Model):
+    __tablename__ = 'subjects'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    teacher = db.relationship('User', foreign_keys=[teacher_id], backref='taught_subjects')
+
+class Grade(db.Model):
+    __tablename__ = 'grades'
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Integer, nullable=False) # 2, 3, 4, 5, 6
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+
 def get_authenticated_user():
     auth_token = request.headers.get('Authorization')
     if not auth_token:
@@ -33,20 +47,32 @@ def get_authenticated_user():
     return User.query.filter_by(token=auth_token).first()
 
 @app.route('/')
-def index():
+def login_page():
     return app.send_static_file('html/login.html')
 
-@app.route('/teacher')
-def teacher_panel():
-    return app.send_static_file('html/techerUI.html')
+@app.route('/register')
+def register_page():
+    return app.send_static_file('html/register.html')
 
-@app.route('/admin')
-def admin_panel():
+@app.route('/admin/users')
+def admin_users_panel():
     return app.send_static_file('html/admin_users.html')
 
 @app.route('/admin/classes')
 def admin_classes_panel():
     return app.send_static_file('html/admin_classes.html')
+
+@app.route('/admin/subjects')
+def admin_subjects_panel():
+    return app.send_static_file('html/admin_subjects.html')
+
+@app.route('/student')
+def student_panel():
+    return app.send_static_file('html/studentUI.html')
+
+@app.route('/teacher')
+def teacher_panel():
+    return app.send_static_file('html/teacherUI.html')
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
@@ -160,53 +186,6 @@ def create_user():
     db.session.commit()
     return jsonify({"id": new_user.id, "name": new_user.name, "email": new_user.email}), 201
 
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    current_user = get_authenticated_user()
-    if not current_user:
-        return jsonify({"error": "Unauthorized"}), 401
-    if current_user.role != 'Админ':
-        return jsonify({"error": "Forbidden"}), 403
-        
-    u = User.query.get(user_id)
-    if not u:
-        return jsonify({"error": "Not Found"}), 404
-        
-    data = request.get_json()
-    if not data or not all(k in data for k in ('name', 'email', 'role')):
-        return jsonify({"error": "Bad Request"}), 400
-        
-    u.name = data['name']
-    u.email = data['email']
-    u.role = data['role']
-    if 'class_id' in data:
-        u.class_id = data['class_id']
-        
-    db.session.commit()
-    return jsonify({"id": u.id, "name": u.name, "email": u.email}), 200
-
-@app.route('/users/<int:user_id>', methods=['PATCH'])
-def patch_user(user_id):
-    current_user = get_authenticated_user()
-    if not current_user:
-        return jsonify({"error": "Unauthorized"}), 401
-        
-    u = User.query.get(user_id)
-    if not u:
-        return jsonify({"error": "Not Found"}), 404
-        
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Bad Request"}), 400
-        
-    if 'name' in data:
-        u.name = data['name']
-    if 'email' in data:
-        u.email = data['email']
-        
-    db.session.commit()
-    return jsonify({"id": u.id, "name": u.name}), 200
-
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     current_user = get_authenticated_user()
@@ -241,22 +220,6 @@ def get_classes():
         })
     return jsonify(result), 200
 
-@app.route('/classes/<int:class_id>', methods=['GET'])
-def get_class(class_id):
-    current_user = get_authenticated_user()
-    if not current_user:
-        return jsonify({"error": "Unauthorized"}), 401
-        
-    c = Class.query.get(class_id)
-    if not c:
-        return jsonify({"error": "Not Found"}), 404
-        
-    return jsonify({
-        "id": c.id,
-        "grade": c.grade,
-        "letter": c.letter
-    }), 200
-
 @app.route('/classes', methods=['POST'])
 def create_class():
     current_user = get_authenticated_user()
@@ -274,22 +237,26 @@ def create_class():
     db.session.commit()
     return jsonify({"id": new_class.id, "grade": new_class.grade, "letter": new_class.letter}), 201
 
-@app.route('/classes/<int:class_id>', methods=['DELETE'])
-def delete_class(class_id):
-    current_user = get_authenticated_user()
-    if not current_user:
-        return jsonify({"error": "Unauthorized"}), 401
-    if current_user.role != 'Админ':
-        return jsonify({"error": "Forbidden"}), 403
-        
-    c = Class.query.get(class_id)
-    if not c:
-        return jsonify({"error": "Not Found"}), 404
-        
-    db.session.delete(c)
-    db.session.commit()
-    return "", 204
+def seed_test_data():
+    with app.app_context():
+        db.create_all()
+
+        if not User.query.filter_by(email='admin@school.com').first():
+            db.session.add(User(name='Главен Админ', email='admin@school.com', password='admin123', role='Админ'))
+
+        teacher = User.query.filter_by(email='teacher@school.com').first()
+        if not teacher:
+            teacher = User(name='Петър Петров', email='teacher@school.com', password='teacher123', role='Учител')
+            db.session.add(teacher)
+            db.session.commit()
+
+        if not Subject.query.filter_by(name='Математика').first():
+            db.session.add(Subject(name='Математика', teacher_id=teacher.id))
+            
+        db.session.commit()
+        print("Базата данни беше пресъздадена успешно с предмети и учители!")
+
 
 if __name__ == '__main__':
+    seed_test_data()
     app.run(debug=True, port=5000)
-

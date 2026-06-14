@@ -13,9 +13,9 @@
         </header>
 
         <nav class="admin-nav">
-            <button class="admin-nav-btn active">Потребители(активен)</button>
-            <button class="admin-nav-btn">Класове</button>
-            <button class="admin-nav-btn">Предмети</button>
+            <button class="admin-nav-btn active" onclick="window.location.href='/admin/users'">Потребители(активен)</button>
+            <button class="admin-nav-btn" onclick="window.location.href='/admin/classes'">Класове</button>
+            <button class="admin-nav-btn" onclick="window.location.href='/admin/subjects'">Предмети</button>
         </nav>
 
         <div class="admin-toolbar">
@@ -73,5 +73,6 @@
     </div>
     
     <script src="/static/admin.js"></script>
+    <script src="/static/js/admin_users.js"></script>
 </body>
 </html>
