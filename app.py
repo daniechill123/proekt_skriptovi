@@ -237,6 +237,29 @@ def create_class():
     db.session.commit()
     return jsonify({"id": new_class.id, "grade": new_class.grade, "letter": new_class.letter}), 201
 
+
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    current_user = get_authenticated_user()
+    if not current_user or current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+        
+    data = request.get_json()
+    u = User.query.get(user_id)
+    if not u:
+        return jsonify({"error": "Not Found"}), 404
+        
+    if 'name' in data: 
+        u.name = data['name']
+    if 'email' in data: 
+        u.email = data['email']
+    if 'password' in data and str(data['password']).strip() != '': 
+        u.password = str(data['password']).strip()
+        
+    db.session.commit()
+    return jsonify({"message": "User updated successfully"}), 200
+
+
 def seed_test_data():
     with app.app_context():
         db.create_all()

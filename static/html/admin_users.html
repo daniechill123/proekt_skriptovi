@@ -24,7 +24,7 @@
                 <input type="text" id="search-input">
             </div>
             <div class="add-action-group">
-                <button class="btn-add-profile">+ Добавяне на нов профил</button>
+                <button id="open-add-modal-btn" class="btn-add-profile">+ Добавяне на нов профил</button>
             </div>
         </div>
 
@@ -39,7 +39,7 @@
                         <th>Редактиране/ изтриване</th>
                     </tr>
                 </thead>
-                <tbody id="admin-users-tbody">
+                <tbody id="users-table-body">
                     <tr>
                         <td>Даниел Филипов</td>
                         <td>123abvblablabla@gmail.com</td>
@@ -71,8 +71,59 @@
             <h2 class="footer-title">Дневник</h2>
         </footer>
     </div>
-    
+
+    <div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Редактиране на потребител</h3>
+            
+            <input type="hidden" id="edit-user-id">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име:</label>
+            <input type="text" id="edit-user-name" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Имейл:</label>
+            <input type="email" id="edit-user-email" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Нова Парола:</label>
+            <input type="password" id="edit-user-password" placeholder="Остави празна, ако не я сменяш" style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <div style="text-align:right;">
+                <button id="close-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                <button id="save-modal-btn" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Запази промените</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Добавяне на нов потребител</h3>
+            <form id="add-user-form">
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име:</label>
+                <input type="text" id="add-user-name" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Имейл:</label>
+                <input type="email" id="add-user-email" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Парола:</label>
+                <input type="password" id="add-user-password" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Роля:</label>
+                <select id="add-user-role" required style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                    <option value="Админ">Админ</option>
+                    <option value="Учител">Учител</option>
+                    <option value="Ученик">Ученик</option>
+                </select>
+                
+                <div style="text-align:right;">
+                    <button type="button" id="close-add-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                    <button type="submit" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Добави</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/static/admin.js"></script>
+    <script src="/static/js/popup.js"></script>
     <script src="/static/js/admin_users.js"></script>
 </body>
 </html>
