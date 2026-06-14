@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панел - Класове</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="admin-page-body">
+    <div class="admin-layout">
+        <header class="admin-header">
+            <h1>ADMIN</h1>
+        </header>
+
+        <nav class="admin-nav">
+            <button class="admin-nav-btn" onclick="window.location.href='/admin'">Потребители</button>
+            <button class="admin-nav-btn active" onclick="window.location.href='/admin/classes'">Класове(активен)</button>
+            <button class="admin-nav-btn">Предмети</button>
+        </nav>
+
+        <div class="admin-toolbar">
+            <div class="search-group">
+                <label for="class-select">Търсене по номер</label>
+                <select id="class-select" class="admin-select">
+                    <option value=""></option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+            <div class="add-action-group">
+                <button class="btn-add-profile">+ Добавяне на нов клас</button>
+            </div>
+        </div>
+
+        <main class="admin-main-content">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Клас</th>
+                        <th>Паралелка</th>
+                        <th>Брой ученици</th>
+                        <th>Редактиране/ изтриване</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-classes-tbody">
+                    <tr>
+                        <td>9</td>
+                        <td>А</td>
+                        <td>23</td>
+                        <td class="action-icons">
+                            <button class="icon-btn edit-btn">✏️</button>
+                            <button class="icon-btn delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <footer class="admin-footer">
+            <div class="footer-logo-wrapper">
+                <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
+            </div>
+            <h2 class="footer-title">Дневник</h2>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дневник - Учителски панел</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="diary-page-body">
+    <div class="diary-layout">
+        
+        <aside class="sidebar">
+            <div class="class-list-container" id="class-sidebar-list">
+                <button class="class-sidebar-btn active" data-class="9а">9а клас</button>
+                <button class="class-sidebar-btn" data-class="9б">9б клас</button>
+                <button class="class-sidebar-btn" data-class="9в">9в клас</button>
+                <button class="class-sidebar-btn" data-class="9г">9г клас</button>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="footer-logo-wrapper">
+                    <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
+                </div>
+                <h2 class="footer-title">Дневник</h2>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-class-header">
+                <h1 id="current-class-title">9а клас</h1>
+            </header>
+
+            <div class="diary-grid-wrapper">
+                <table class="diary-style-table">
+                    <tbody id="students-table-body">
+                        <tr>
+                            <td class="cell-student-name">Даниел Александър Филипов</td>
+                            <td class="cell-grades">
+                                <div class="grade-label">Текущи оценки:</div>
+                                <div class="grade-values-list">6,5,6,5,4,6,6,6</div>
+                            </td>
+                            <td class="cell-actions">
+                                <div class="action-label">Нова оценка:</div>
+                                <div class="circle-buttons-group">
+                                    <button class="circle-grade-btn g-6" data-grade="6">6</button>
+                                    <button class="circle-grade-btn g-5" data-grade="5">5</button>
+                                    <button class="circle-grade-btn g-4" data-grade="4">4</button>
+                                    <button class="circle-grade-btn g-3" data-grade="3">3</button>
+                                    <button class="circle-grade-btn g-2" data-grade="2">2</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-student-name">Александър Георгиев Петров</td>
+                            <td class="cell-grades">
+                                <div class="grade-label">Текущи оценки:</div>
+                                <div class="grade-values-list">5,5,6,4,5</div>
+                            </td>
+                            <td class="cell-actions">
+                                <div class="action-label">Нова оценка:</div>
+                                <div class="circle-buttons-group">
+                                    <button class="circle-grade-btn g-6" data-grade="6">6</button>
+                                    <button class="circle-grade-btn g-5" data-grade="5">5</button>
+                                    <button class="circle-grade-btn g-4" data-grade="4">4</button>
+                                    <button class="circle-grade-btn g-3" data-grade="3">3</button>
+                                    <button class="circle-grade-btn g-2" data-grade="2">2</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/teacher.js"></script>
+</body>
+</html>

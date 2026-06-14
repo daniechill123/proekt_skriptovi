@@ -1,14 +1,77 @@
-<table>
-    <tr>
-        <th>Име</th>
-        <th>Имейл</th>
-        <th>Роля</th>
-    </tr>
-    {% for user in users %}
-    <tr>
-        <td>{{user.name}}</td>
-        <td>{{user.email}}</td>
-        <td>{{user.role}}</td>
-    </tr>
-    {% endfor %}
-</table>
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панел</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="admin-page-body">
+    <div class="admin-layout">
+        <header class="admin-header">
+            <h1>ADMIN</h1>
+        </header>
+
+        <nav class="admin-nav">
+            <button class="admin-nav-btn active">Потребители(активен)</button>
+            <button class="admin-nav-btn">Класове</button>
+            <button class="admin-nav-btn">Предмети</button>
+        </nav>
+
+        <div class="admin-toolbar">
+            <div class="search-group">
+                <label for="search-input">Търсене по име или Имейл</label>
+                <input type="text" id="search-input">
+            </div>
+            <div class="add-action-group">
+                <button class="btn-add-profile">+ Добавяне на нов профил</button>
+            </div>
+        </div>
+
+        <main class="admin-main-content">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Име</th>
+                        <th>Имейл</th>
+                        <th>Роля</th>
+                        <th>Детайли</th>
+                        <th>Редактиране/ изтриване</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-users-tbody">
+                    <tr>
+                        <td>Даниел Филипов</td>
+                        <td>123abvblablabla@gmail.com</td>
+                        <td>Ученик</td>
+                        <td>9а клас</td>
+                        <td class="action-icons">
+                            <button class="icon-btn edit-btn">✏️</button>
+                            <button class="icon-btn delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Даниел Димитров</td>
+                        <td>123abvblablabla@gmail.com</td>
+                        <td>Учител</td>
+                        <td>БЕЛ</td>
+                        <td class="action-icons">
+                            <button class="icon-btn edit-btn">✏️</button>
+                            <button class="icon-btn delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <footer class="admin-footer">
+            <div class="footer-logo-wrapper">
+                <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
+            </div>
+            <h2 class="footer-title">Дневник</h2>
+        </footer>
+    </div>
+    
+    <script src="/static/admin.js"></script>
+</body>
+</html>
