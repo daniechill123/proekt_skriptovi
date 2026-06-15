@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
 
+    // Проверка за оторизация
     if (!token || role !== 'Ученик') {
         window.location.href = '/';
         return;
     }
 
+    // Бутон за изход
     document.getElementById('logout-button')?.addEventListener('click', () => {
         localStorage.clear();
         window.location.href = '/';
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const tbody = document.getElementById('grades-table-body');
 
+    // Помощна функция за създаване на контейнер с кутийки за текущите оценки
     function createGradesContainer(gradesArray) {
         const container = document.createElement('div');
         container.className = 'grades-container';
@@ -30,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return container;
     }
 
+    // Помощна функция за създаване на клетка за единична оценка (срочна/годишна)
     function createSingleGrade(val) {
         const td = document.createElement('td');
         td.style.textAlign = 'center';
@@ -46,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+        // Заявка към сървъра за оценките на ученика
         const response = await fetch('/student/grades', {
             method: 'GET',
             headers: { 'Authorization': token }

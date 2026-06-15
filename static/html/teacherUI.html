@@ -11,10 +11,6 @@
         
         <aside class="sidebar">
             <div class="class-list-container" id="class-sidebar-list">
-                <button class="class-sidebar-btn active" data-class="9а">9а клас</button>
-                <button class="class-sidebar-btn" data-class="9б">9б клас</button>
-                <button class="class-sidebar-btn" data-class="9в">9в клас</button>
-                <button class="class-sidebar-btn" data-class="9г">9г клас</button>
             </div>
             
             <div class="sidebar-footer">
@@ -22,58 +18,37 @@
                     <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
                 </div>
                 <h2 class="footer-title">Дневник</h2>
+                <button id="logout-btn" style="margin-top: 15px; padding: 5px 15px; cursor: pointer;">Изход</button>
             </div>
         </aside>
 
         <main class="main-content">
             <header class="main-class-header">
-                <h1 id="current-class-title">9а клас</h1>
+                <h1 id="current-class-title" style="text-align: center;">Изберете клас</h1>
             </header>
-
-            <div class="diary-grid-wrapper">
-                <table class="diary-style-table">
-                    <tbody id="students-table-body">
+            
+            <div class="table-container">
+                <table border="1" style="width:100%; border-collapse: collapse;">
+                    <thead>
                         <tr>
-                            <td class="cell-student-name">Даниел Александър Филипов</td>
-                            <td class="cell-grades">
-                                <div class="grade-label">Текущи оценки:</div>
-                                <div class="grade-values-list">6,5,6,5,4,6,6,6</div>
-                            </td>
-                            <td class="cell-actions">
-                                <div class="action-label">Нова оценка:</div>
-                                <div class="circle-buttons-group">
-                                    <button class="circle-grade-btn g-6" data-grade="6">6</button>
-                                    <button class="circle-grade-btn g-5" data-grade="5">5</button>
-                                    <button class="circle-grade-btn g-4" data-grade="4">4</button>
-                                    <button class="circle-grade-btn g-3" data-grade="3">3</button>
-                                    <button class="circle-grade-btn g-2" data-grade="2">2</button>
-                                </div>
-                            </td>
+                            <th rowspan="2">Ученик</th>
+                            <th colspan="2">Първи срок</th>
+                            <th colspan="2">Втори срок</th>
                         </tr>
                         <tr>
-                            <td class="cell-student-name">Александър Георгиев Петров</td>
-                            <td class="cell-grades">
-                                <div class="grade-label">Текущи оценки:</div>
-                                <div class="grade-values-list">5,5,6,4,5</div>
-                            </td>
-                            <td class="cell-actions">
-                                <div class="action-label">Нова оценка:</div>
-                                <div class="circle-buttons-group">
-                                    <button class="circle-grade-btn g-6" data-grade="6">6</button>
-                                    <button class="circle-grade-btn g-5" data-grade="5">5</button>
-                                    <button class="circle-grade-btn g-4" data-grade="4">4</button>
-                                    <button class="circle-grade-btn g-3" data-grade="3">3</button>
-                                    <button class="circle-grade-btn g-2" data-grade="2">2</button>
-                                </div>
-                            </td>
+                            <th>Текущи оценки</th>
+                            <th>Нова оценка</th>
+                            <th>Текущи оценки</th>
+                            <th>Нова оценка</th>
                         </tr>
+                    </thead>
+                    <tbody id="teacher-table-body">
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
 
-    <script src="/static/teacher.js"></script>
     <script src="/static/js/teacherUI.js"></script>
 </body>
 </html>
