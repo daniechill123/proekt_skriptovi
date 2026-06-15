@@ -50,10 +50,6 @@ def get_authenticated_user():
 def login_page():
     return app.send_static_file('html/login.html')
 
-@app.route('/register')
-def register_page():
-    return app.send_static_file('html/register.html')
-
 @app.route('/admin/users')
 def admin_users_panel():
     return app.send_static_file('html/admin_users.html')
@@ -73,25 +69,6 @@ def student_panel():
 @app.route('/teacher')
 def teacher_panel():
     return app.send_static_file('html/teacherUI.html')
-
-@app.route('/sign-up', methods=['POST'])
-def sign_up():
-    data = request.get_json()
-    if not data or not all(k in data for k in ('name', 'email', 'password', 'role')):
-        return jsonify({"error": "Missing data"}), 400
-    
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({"error": "Email already exists"}), 400
-
-    new_user = User(
-        name=data['name'],
-        email=data['email'],
-        password=data['password'],
-        role=data['role']
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/sign-in', methods=['POST'])
 def sign_in():
@@ -156,7 +133,63 @@ def get_subjects():
     if not current_user:
         return jsonify({"error": "Unauthorized"}), 401
     subjects = Subject.query.all()
-    return jsonify([{"id": s.id, "name": s.name, "teacher_id": s.teacher_id} for s in subjects]), 200
+    result = []
+    for s in subjects:
+        teacher_name = s.teacher.name if s.teacher else "Няма назначен"
+        result.append({
+            "id": s.id, 
+            "name": s.name, 
+            "teacher_id": s.teacher_id,
+            "teacher_name": teacher_name
+        })
+    return jsonify(result), 200
+
+@app.route('/subjects', methods=['POST'])
+def create_subject():
+    current_user = get_authenticated_user()
+    if not current_user or current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+    data = request.get_json()
+    if not data or 'name' not in data:
+        return jsonify({"error": "Bad Request"}), 400
+    
+    new_sub = Subject(name=data['name'], teacher_id=data.get('teacher_id'))
+    db.session.add(new_sub)
+    db.session.commit()
+    return jsonify({"id": new_sub.id, "name": new_sub.name}), 201
+
+@app.route('/subjects/<int:subject_id>', methods=['PUT', 'PATCH'])
+def update_subject(subject_id):
+    current_user = get_authenticated_user()
+    if not current_user or current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+    data = request.get_json()
+    sub = Subject.query.get(subject_id)
+    if not sub:
+        return jsonify({"error": "Not Found"}), 404
+        
+    if 'name' in data:
+        sub.name = data['name']
+    if 'teacher_id' in data:
+        sub.teacher_id = data['teacher_id'] if data['teacher_id'] else None
+        
+    db.session.commit()
+    return jsonify({"message": "Subject updated successfully"}), 200
+
+@app.route('/subjects/<int:subject_id>', methods=['DELETE'])
+def delete_subject(subject_id):
+    current_user = get_authenticated_user()
+    if not current_user or current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+    sub = Subject.query.get(subject_id)
+    if not sub:
+        return jsonify({"error": "Not Found"}), 404
+
+    Grade.query.filter_by(subject_id=sub.id).delete()
+    
+    db.session.delete(sub)
+    db.session.commit()
+    return "", 204
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
