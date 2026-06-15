@@ -129,19 +129,34 @@ def get_users():
     result = []
     for u in users:
         details = "-"
+        subject_id = None
         if u.role == "Ученик" and u.assigned_class:
             details = f"{u.assigned_class.grade}{u.assigned_class.letter} клас"
         elif u.role == "Учител":
-            details = "БЕЛ"
+            if u.taught_subjects:
+                details = ", ".join([s.name for s in u.taught_subjects])
+                subject_id = u.taught_subjects[0].id
+            else:
+                details = "Няма предмет"
             
         result.append({
             "id": u.id,
             "name": u.name,
             "email": u.email,
             "role": u.role,
-            "details": details
+            "details": details,
+            "class_id": u.class_id,
+            "subject_id": subject_id
         })
     return jsonify(result), 200
+
+@app.route('/subjects', methods=['GET'])
+def get_subjects():
+    current_user = get_authenticated_user()
+    if not current_user:
+        return jsonify({"error": "Unauthorized"}), 401
+    subjects = Subject.query.all()
+    return jsonify([{"id": s.id, "name": s.name, "teacher_id": s.teacher_id} for s in subjects]), 200
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
@@ -152,12 +167,15 @@ def get_user(user_id):
     u = User.query.get(user_id)
     if not u:
         return jsonify({"error": "Not Found"}), 404
-        
+    
+    subject_id = u.taught_subjects[0].id if u.taught_subjects else None
     return jsonify({
         "id": u.id,
         "name": u.name,
         "email": u.email,
-        "role": u.role
+        "role": u.role,
+        "class_id": u.class_id,
+        "subject_id": subject_id
     }), 200
 
 @app.route('/users', methods=['POST'])
@@ -180,10 +198,17 @@ def create_user():
         email=data['email'],
         password=data['password'],
         role=data['role'],
-        class_id=data.get('class_id')
+        class_id=data.get('class_id') if data['role'] == 'Ученик' else None
     )
     db.session.add(new_user)
     db.session.commit()
+
+    if data['role'] == 'Учител' and data.get('subject_id'):
+        sub = Subject.query.get(data['subject_id'])
+        if sub:
+            sub.teacher_id = new_user.id
+            db.session.commit()
+
     return jsonify({"id": new_user.id, "name": new_user.name, "email": new_user.email}), 201
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
@@ -197,7 +222,9 @@ def delete_user(user_id):
     u = User.query.get(user_id)
     if not u:
         return jsonify({"error": "Not Found"}), 404
-        
+
+    Subject.query.filter_by(teacher_id=u.id).update({Subject.teacher_id: None})
+    
     db.session.delete(u)
     db.session.commit()
     return "", 204
@@ -237,8 +264,44 @@ def create_class():
     db.session.commit()
     return jsonify({"id": new_class.id, "grade": new_class.grade, "letter": new_class.letter}), 201
 
+@app.route('/classes/<int:class_id>', methods=['DELETE'])
+def delete_class(class_id):
+    current_user = get_authenticated_user()
+    if not current_user:
+        return jsonify({"error": "Unauthorized"}), 401
+    if current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+        
+    cls = Class.query.get(class_id)
+    if not cls:
+        return jsonify({"error": "Not Found"}), 404
 
-@app.route('/users/<int:user_id>', methods=['PUT'])
+    User.query.filter_by(class_id=cls.id).update({User.class_id: None})
+    
+    db.session.delete(cls)
+    db.session.commit()
+    return "", 204
+
+@app.route('/classes/<int:class_id>', methods=['PUT', 'PATCH'])
+def update_class(class_id):
+    current_user = get_authenticated_user()
+    if not current_user or current_user.role != 'Админ':
+        return jsonify({"error": "Forbidden"}), 403
+        
+    data = request.get_json()
+    cls = Class.query.get(class_id)
+    if not cls:
+        return jsonify({"error": "Not Found"}), 404
+    
+    if 'grade' in data:
+        cls.grade = int(data['grade'])
+    if 'letter' in data:
+        cls.letter = str(data['letter']).strip()
+        
+    db.session.commit()
+    return jsonify({"message": "Class updated successfully"}), 200
+
+@app.route('/users/<int:user_id>', methods=['PATCH','PUT'])
 def update_user(user_id):
     current_user = get_authenticated_user()
     if not current_user or current_user.role != 'Админ':
@@ -255,6 +318,16 @@ def update_user(user_id):
         u.email = data['email']
     if 'password' in data and str(data['password']).strip() != '': 
         u.password = str(data['password']).strip()
+        
+    if 'class_id' in data:
+        u.class_id = data['class_id'] if u.role == 'Ученик' else None
+
+    if 'subject_id' in data:
+        Subject.query.filter_by(teacher_id=u.id).update({Subject.teacher_id: None})
+        if data['subject_id']:
+            sub = Subject.query.get(data['subject_id'])
+            if sub:
+                sub.teacher_id = u.id
         
     db.session.commit()
     return jsonify({"message": "User updated successfully"}), 200
@@ -277,7 +350,7 @@ def seed_test_data():
             db.session.add(Subject(name='Математика', teacher_id=teacher.id))
             
         db.session.commit()
-        print("Базата данни беше пресъздадена успешно с предмети и учители!")
+        print("Базата данни беше пресъздадена успешно!")
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ панел</title>
+    <title>Админ панел - Потребители</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body class="admin-page-body">
@@ -40,26 +40,6 @@
                     </tr>
                 </thead>
                 <tbody id="users-table-body">
-                    <tr>
-                        <td>Даниел Филипов</td>
-                        <td>123abvblablabla@gmail.com</td>
-                        <td>Ученик</td>
-                        <td>9а клас</td>
-                        <td class="action-icons">
-                            <button class="icon-btn edit-btn">✏️</button>
-                            <button class="icon-btn delete-btn">🗑️</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Даниел Димитров</td>
-                        <td>123abvblablabla@gmail.com</td>
-                        <td>Учител</td>
-                        <td>БЕЛ</td>
-                        <td class="action-icons">
-                            <button class="icon-btn edit-btn">✏️</button>
-                            <button class="icon-btn delete-btn">🗑️</button>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </main>
@@ -85,7 +65,21 @@
             <input type="email" id="edit-user-email" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
             
             <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Нова Парола:</label>
-            <input type="password" id="edit-user-password" placeholder="Остави празна, ако не я сменяш" style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            <input type="password" id="edit-user-password" placeholder="Остави празна, ако не я сменяш" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <div id="edit-class-group" style="display:none; margin-bottom:1.25rem;">
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас:</label>
+                <select id="edit-user-class" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                    <option value="">-- Избери клас --</option>
+                </select>
+            </div>
+            
+            <div id="edit-subject-group" style="display:none; margin-bottom:1.25rem;">
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Предмет:</label>
+                <select id="edit-user-subject" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                    <option value="">-- Избери предмет --</option>
+                </select>
+            </div>
             
             <div style="text-align:right;">
                 <button id="close-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
@@ -108,11 +102,25 @@
                 <input type="password" id="add-user-password" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                 
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Роля:</label>
-                <select id="add-user-role" required style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                <select id="add-user-role" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                     <option value="Админ">Админ</option>
                     <option value="Учител">Учител</option>
                     <option value="Ученик">Ученик</option>
                 </select>
+
+                <div id="add-class-group" style="display:none; margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас:</label>
+                    <select id="add-user-class" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                        <option value="">-- Избери клас --</option>
+                    </select>
+                </div>
+
+                <div id="add-subject-group" style="display:none; margin-bottom:1.25rem;">
+                    <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Предмет:</label>
+                    <select id="add-user-subject" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                        <option value="">-- Избери предмет --</option>
+                    </select>
+                </div>
                 
                 <div style="text-align:right;">
                     <button type="button" id="close-add-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
@@ -122,8 +130,6 @@
         </div>
     </div>
 
-    <script src="/static/admin.js"></script>
-    <script src="/static/js/popup.js"></script>
     <script src="/static/js/admin_users.js"></script>
 </body>
 </html>

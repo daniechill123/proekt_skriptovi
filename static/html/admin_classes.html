@@ -14,15 +14,22 @@
 
         <nav class="admin-nav">
             <button class="admin-nav-btn" onclick="window.location.href='/admin/users'">Потребители</button>
-            <button class="admin-nav-btn active" onclick="window.location.href='/admin/classes'">Класове(активен)</button>
+            <button class="admin-nav-btn active" onclick="window.location.href='/admin/classes'">Класове</button>
             <button class="admin-nav-btn" onclick="window.location.href='/admin/subjects'">Предмети</button>
         </nav>
 
         <div class="admin-toolbar">
             <div class="search-group">
-                <label for="class-select">Търсене по номер</label>
-                <select id="class-select" class="admin-select">
-                    <option value=""></option>
+                <label for="search-input">Търсене по номер</label>
+                <select id="search-input" style="padding:0.4rem; border-radius:0.25rem; font-size:1rem;">
+                    <option value="">Всички</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
@@ -31,7 +38,7 @@
                 </select>
             </div>
             <div class="add-action-group">
-                <button class="btn-add-profile">+ Добавяне на нов клас</button>
+                <button id="open-add-modal-btn" class="btn-add-profile">+ Добавяне на нов клас</button>
             </div>
         </div>
 
@@ -45,16 +52,7 @@
                         <th>Редактиране/ изтриване</th>
                     </tr>
                 </thead>
-                <tbody id="admin-classes-tbody">
-                    <tr>
-                        <td>9</td>
-                        <td>А</td>
-                        <td>23</td>
-                        <td class="action-icons">
-                            <button class="icon-btn edit-btn">✏️</button>
-                            <button class="icon-btn delete-btn">🗑️</button>
-                        </td>
-                    </tr>
+                <tbody id="classes-table-body">
                 </tbody>
             </table>
         </main>
@@ -66,6 +64,44 @@
             <h2 class="footer-title">Дневник</h2>
         </footer>
     </div>
+
+    <div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Редактиране на клас</h3>
+            
+            <input type="hidden" id="edit-class-id">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас (число):</label>
+            <input type="number" id="edit-class-grade" min="1" max="12" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Паралелка (буква):</label>
+            <input type="text" id="edit-class-section" required style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <div style="text-align:right;">
+                <button id="close-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                <button id="save-modal-btn" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Запази промените</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Добавяне на нов клас</h3>
+            <form id="add-class-form">
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас (число):</label>
+                <input type="number" id="add-class-grade" min="1" max="12" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Паралелка (буква):</label>
+                <input type="text" id="add-class-section" required style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <div style="text-align:right;">
+                    <button type="button" id="close-add-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                    <button type="submit" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Добави</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/static/js/admin_classes.js"></script>
 </body>
 </html>
