@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ панел - Класове</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body.admin-page-body {
+            background-color: #f9f9f9 !important;
+            background-image: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            align-items: stretch !important;
+            font-family: sans-serif !important;
+        }
+        .admin-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            padding-bottom: 100px;
+        }
+        .admin-header {
+            text-align: center !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0 !important;
+        }
+        .admin-header h1 {
+            margin: 0 !important;
+            font-size: 2.5rem !important;
+        }
+    </style>
 </head>
 <body class="admin-page-body">
     <div class="admin-layout">
@@ -21,7 +53,7 @@
         <div class="admin-toolbar">
             <div class="search-group">
                 <label for="search-input">Търсене по номер</label>
-                <select id="search-input" style="padding:0.4rem; border-radius:0.25rem; font-size:1rem;">
+                <select id="search-input" style="padding:0.4rem; border-radius:0.25rem; font-size:1rem; border:1px solid #ccc;">
                     <option value="">Всички</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -56,13 +88,6 @@
                 </tbody>
             </table>
         </main>
-
-        <footer class="admin-footer">
-            <div class="footer-logo-wrapper">
-                <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
-            </div>
-            <h2 class="footer-title">Дневник</h2>
-        </footer>
     </div>
 
     <div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
@@ -99,6 +124,22 @@
                     <button type="submit" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Добави</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div class="footer-left">
+            <div class="footer-icon-box">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5.49 12l6.51 3.55 6.51-3.55L12 8.45 5.49 12zm-3.37 3.3l1.86 1.01L12 20.67l7.98-4.35 1.86-1.01V17l-9.84 5.37L2.12 17v-1.7z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="footer-center">
+            <h2>Дневник</h2>
+        </div>
+        <div class="footer-right">
+            <img src="/static/images/logo_footer.png?v=1" alt="Лого" class="footer-logo">
         </div>
     </div>
 

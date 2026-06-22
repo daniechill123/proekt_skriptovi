@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ панел - Потребители</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body.admin-page-body {
+            background-color: #f9f9f9 !important;
+            background-image: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            align-items: stretch !important;
+            font-family: sans-serif !important;
+        }
+        .admin-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            padding-bottom: 100px;
+        }
+        .admin-header {
+            text-align: center !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0 !important;
+        }
+        .admin-header h1 {
+            margin: 0 !important;
+            font-size: 2.5rem !important;
+        }
+    </style>
 </head>
 <body class="admin-page-body">
     <div class="admin-layout">
@@ -13,7 +45,7 @@
         </header>
 
         <nav class="admin-nav">
-            <button class="admin-nav-btn active" onclick="window.location.href='/admin/users'">Потребители(активен)</button>
+            <button class="admin-nav-btn active" onclick="window.location.href='/admin/users'">Потребители</button>
             <button class="admin-nav-btn" onclick="window.location.href='/admin/classes'">Класове</button>
             <button class="admin-nav-btn" onclick="window.location.href='/admin/subjects'">Предмети</button>
         </nav>
@@ -21,7 +53,7 @@
         <div class="admin-toolbar">
             <div class="search-group">
                 <label for="search-input">Търсене по име или Имейл</label>
-                <input type="text" id="search-input">
+                <input type="text" id="search-input" style="padding:0.4rem; border-radius:0.25rem; font-size:1rem; border:1px solid #ccc;">
             </div>
             <div class="add-action-group">
                 <button id="open-add-modal-btn" class="btn-add-profile">+ Добавяне на нов профил</button>
@@ -36,44 +68,37 @@
                         <th>Имейл</th>
                         <th>Роля</th>
                         <th>Детайли</th>
-                        <th>Редактиране/ изтриване</th>
+                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody id="users-table-body">
                 </tbody>
             </table>
         </main>
-
-        <footer class="admin-footer">
-            <div class="footer-logo-wrapper">
-                <img src="/static/images/LOGO.png" alt="Лого" class="footer-logo">
-            </div>
-            <h2 class="footer-title">Дневник</h2>
-        </footer>
     </div>
 
     <div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
-            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Редактиране на потребител</h3>
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Редактиране на профил</h3>
             
             <input type="hidden" id="edit-user-id">
             
             <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име:</label>
-            <input type="text" id="edit-user-name" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            <input type="text" id="edit-user-name" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
             
             <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Имейл:</label>
-            <input type="email" id="edit-user-email" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            <input type="email" id="edit-user-email" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
             
-            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Нова Парола:</label>
-            <input type="password" id="edit-user-password" placeholder="Остави празна, ако не я сменяш" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
-            
-            <div id="edit-class-group" style="display:none; margin-bottom:1.25rem;">
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Нова парола (оставете празно):</label>
+            <input type="password" id="edit-user-password" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+
+            <div id="edit-class-group" style="display:none; margin-bottom:1rem;">
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас:</label>
                 <select id="edit-user-class" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                     <option value="">-- Избери клас --</option>
                 </select>
             </div>
-            
+
             <div id="edit-subject-group" style="display:none; margin-bottom:1.25rem;">
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Предмет:</label>
                 <select id="edit-user-subject" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
@@ -90,7 +115,7 @@
 
     <div id="add-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
         <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
-            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Добавяне на нов потребител</h3>
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Добавяне на нов профил</h3>
             <form id="add-user-form">
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име:</label>
                 <input type="text" id="add-user-name" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
@@ -100,15 +125,15 @@
                 
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Парола:</label>
                 <input type="password" id="add-user-password" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
-                
+
                 <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Роля:</label>
-                <select id="add-user-role" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
-                    <option value="Админ">Админ</option>
-                    <option value="Учител">Учител</option>
+                <select id="add-user-role" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                     <option value="Ученик">Ученик</option>
+                    <option value="Учител">Учител</option>
+                    <option value="Админ">Админ</option>
                 </select>
 
-                <div id="add-class-group" style="display:none; margin-bottom:1.25rem;">
+                <div id="add-class-group" style="display:none; margin-bottom:1rem;">
                     <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Клас:</label>
                     <select id="add-user-class" style="width:100%; padding:0.5rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                         <option value="">-- Избери клас --</option>
@@ -127,6 +152,22 @@
                     <button type="submit" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Добави</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div class="footer-left">
+            <div class="footer-icon-box">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5.49 12l6.51 3.55 6.51-3.55L12 8.45 5.49 12zm-3.37 3.3l1.86 1.01L12 20.67l7.98-4.35 1.86-1.01V17l-9.84 5.37L2.12 17v-1.7z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="footer-center">
+            <h2>Дневник</h2>
+        </div>
+        <div class="footer-right">
+            <img src="/static/images/logo_footer.png?v=1" alt="Лого" class="footer-logo">
         </div>
     </div>
 

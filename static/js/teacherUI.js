@@ -11,10 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
             try {
-                await fetch('/logout', {
-                    method: 'POST',
-                    headers: { 'Authorization': token }
-                });
+                await fetch('/logout', { method: 'POST', headers: { 'Authorization': token } });
             } catch (err) {}
             localStorage.clear();
             window.location.href = '/';
@@ -28,164 +25,217 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadClasses() {
         try {
-            const response = await fetch('/teacher/classes', {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            });
+            const response = await fetch('/classes', { method: 'GET', headers: { 'Authorization': token } });
             if (!response.ok) return;
-            
             const classes = await response.json();
-            if (!Array.isArray(classes)) return;
             
             classSidebarList.innerHTML = '';
-            
             classes.forEach(cls => {
                 const btn = document.createElement('button');
-                btn.className = 'class-sidebar-btn';
-                btn.textContent = cls.name;
+                btn.className = 'class-btn';
+                btn.textContent = `${cls.grade} ${cls.letter} клас`;
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.class-sidebar-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     selectedClassId = cls.id;
-                    if (currentClassTitle) {
-                        currentClassTitle.textContent = cls.name;
-                    }
+                    currentClassTitle.textContent = `Клас: ${cls.grade} "${cls.letter}"`;
                     fetchAndRenderStudents();
                 });
                 classSidebarList.appendChild(btn);
             });
-        } catch (error) {
-            console.error(error);
+        } catch (error) { console.error("Грешка при зареждане на класове:", error); }
+    }
+
+    function createGradeSpan(grade) {
+        if (!grade || grade.value === "-" || grade.value === null) {
+            const empty = document.createElement('span');
+            empty.className = 'no-grades';
+            empty.textContent = '-';
+            return empty;
         }
+        const span = document.createElement('span');
+        span.className = `grade-box grade-${grade.value}`;
+        span.innerHTML = `${grade.value}<button class="delete-grade-badge" onclick="deleteGrade(${grade.id})">&times;</button>`;
+        return span;
     }
 
-    function createGradeButtons(studentId, term) {
-        const btnWrapper = document.createElement('div');
-        btnWrapper.className = 'circle-buttons-group';
-
-        const gradeConfig = [
-            { val: 6, class: 'g-6' },
-            { val: 5, class: 'g-5' },
-            { val: 4, class: 'g-4' },
-            { val: 3, class: 'g-3' },
-            { val: 2, class: 'g-2' }
-        ];
-
-        gradeConfig.forEach(cfg => {
-            const gradeBtn = document.createElement('button');
-            gradeBtn.className = `circle-grade-btn ${cfg.class}`;
-            gradeBtn.textContent = cfg.val;
-            gradeBtn.addEventListener('click', () => addGrade(studentId, cfg.val, term));
-            btnWrapper.appendChild(gradeBtn);
-        });
-
-        return btnWrapper;
-    }
-
-    async function fetchAndRenderStudents() {
-        if (!selectedClassId) return;
-
-        try {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Зареждане...</td></tr>`;
-
-            const response = await fetch(`/teacher/students?class_id=${selectedClassId}`, {
-                method: 'GET',
-                headers: { 'Authorization': token }
+    function createGradeButtonsGroup(studentId, term, type) {
+        const container = document.createElement('div');
+        container.className = 'grade-buttons-group';
+        [2, 3, 4, 5, 6].forEach(num => {
+            const btn = document.createElement('button');
+            btn.className = `btn-add-grade grade-${num}`;
+            btn.textContent = num;
+            btn.type = "button"; 
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                addGrade(studentId, num, term, type);
             });
+            container.appendChild(btn);
+        });
+        return container;
+    }
 
-            if (!response.ok) {
-                let errorMsg = "Грешка при сървъра.";
-                try {
-                    const errData = await response.json();
-                    if (errData.error === "No subject assigned") {
-                        errorMsg = "На този учител няма назначен предмет! Моля, назначете му предмет от Админ панела.";
-                    } else if (errData.error) {
-                        errorMsg = errData.error;
-                    }
-                } catch (e) {}
-                
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding: 20px;">${errorMsg}</td></tr>`;
-                return;
-            }
 
-            const students = await response.json();
+   async function fetchAndRenderStudents() {
+        if (!selectedClassId) return;
+        try {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px;">Зареждане на списъка...</td></tr>`;
+            const response = await fetch(`/classes/${selectedClassId}/students`, {
+                method: 'GET', headers: { 'Authorization': token }
+            });
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+
             tbody.innerHTML = '';
-
-            if (!Array.isArray(students) || students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Няма ученици в този клас.</td></tr>`;
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px;">Няма намерени ученици в този клас.</td></tr>`;
                 return;
             }
 
-            students.forEach(student => {
+            data.forEach(student => {
                 const tr = document.createElement('tr');
 
-                const nameTd = document.createElement('td');
-                nameTd.className = 'cell-student-name';
-                nameTd.textContent = student.name || '';
-                tr.appendChild(nameTd);
+                const tdName = document.createElement('td');
+                tdName.className = 'student-name-cell';
+                tdName.textContent = student.name;
+                tr.appendChild(tdName);
 
-                const t1Grades = student.grades_term1 || [];
-                const t1GradesTd = document.createElement('td');
-                t1GradesTd.className = 'cell-grades';
-                t1GradesTd.innerHTML = `
-                    <div class="grade-label">Текущи оценки:</div>
-                    <div class="grade-values-list">${t1Grades.length > 0 ? t1Grades.join(', ') : '-'}</div>
-                `;
-                tr.appendChild(t1GradesTd);
+                const tdT1Current = document.createElement('td');
+                const divT1 = document.createElement('div');
+                divT1.className = 'grades-flex-container';
+                if (student.term1_grades && student.term1_grades.length > 0) {
+                    student.term1_grades.forEach(g => divT1.appendChild(createGradeSpan(g)));
+                } else { 
+                    divT1.appendChild(createGradeSpan(null)); 
+                }
+                tdT1Current.appendChild(divT1);
+                tr.appendChild(tdT1Current);
 
-                const t1ActionTd = document.createElement('td');
-                t1ActionTd.className = 'cell-actions';
-                t1ActionTd.innerHTML = `<div class="action-label">Нова оценка:</div>`;
-                t1ActionTd.appendChild(createGradeButtons(student.id, 1));
-                tr.appendChild(t1ActionTd);
+                const tdT1Final = document.createElement('td');
+                tdT1Final.style.textAlign = 'center';
+                tdT1Final.appendChild(createGradeSpan(student.term1_final));
+                tr.appendChild(tdT1Final);
 
-                const t2Grades = student.grades_term2 || [];
-                const t2GradesTd = document.createElement('td');
-                t2GradesTd.className = 'cell-grades';
-                t2GradesTd.innerHTML = `
-                    <div class="grade-label">Текущи оценки:</div>
-                    <div class="grade-values-list">${t2Grades.length > 0 ? t2Grades.join(', ') : '-'}</div>
-                `;
-                tr.appendChild(t2GradesTd);
+                const tdT1Action = document.createElement('td');
+                const divT1Act = document.createElement('div');
+                divT1Act.className = 'action-cell-wrapper';
+                
+                const lblT1Curr = document.createElement('div');
+                lblT1Curr.className = 'mini-label';
+                lblT1Curr.textContent = 'Текуща:';
+                divT1Act.appendChild(lblT1Curr);
+                divT1Act.appendChild(createGradeButtonsGroup(student.id, 1, 'текуща'));
 
-                const t2ActionTd = document.createElement('td');
-                t2ActionTd.className = 'cell-actions';
-                t2ActionTd.innerHTML = `<div class="action-label">Нова оценка:</div>`;
-                t2ActionTd.appendChild(createGradeButtons(student.id, 2));
-                tr.appendChild(t2ActionTd);
+                const lblT1Fin = document.createElement('div');
+                lblT1Fin.className = 'mini-label';
+                lblT1Fin.textContent = 'Срочна:';
+                divT1Act.appendChild(lblT1Fin);
+                divT1Act.appendChild(createGradeButtonsGroup(student.id, 1, 'срочна'));
+                
+                tdT1Action.appendChild(divT1Act);
+                tr.appendChild(tdT1Action);
+
+                const tdT2Current = document.createElement('td');
+                const divT2 = document.createElement('div');
+                divT2.className = 'grades-flex-container';
+                if (student.term2_grades && student.term2_grades.length > 0) {
+                    student.term2_grades.forEach(g => divT2.appendChild(createGradeSpan(g)));
+                } else { 
+                    divT2.appendChild(createGradeSpan(null)); 
+                }
+                tdT2Current.appendChild(divT2);
+                tr.appendChild(tdT2Current);
+
+                const tdT2Final = document.createElement('td');
+                tdT2Final.style.textAlign = 'center';
+                tdT2Final.appendChild(createGradeSpan(student.term2_final));
+                tr.appendChild(tdT2Final);
+
+                const tdT2Action = document.createElement('td');
+                const divT2Act = document.createElement('div');
+                divT2Act.className = 'action-cell-wrapper';
+                
+                const lblT2Curr = document.createElement('div');
+                lblT2Curr.className = 'mini-label';
+                lblT2Curr.textContent = 'Текуща:';
+                divT2Act.appendChild(lblT2Curr);
+                divT2Act.appendChild(createGradeButtonsGroup(student.id, 2, 'текуща'));
+
+                const lblT2Fin = document.createElement('div');
+                lblT2Fin.className = 'mini-label';
+                lblT2Fin.textContent = 'Срочна:';
+                divT2Act.appendChild(lblT2Fin);
+                divT2Act.appendChild(createGradeButtonsGroup(student.id, 2, 'срочна'));
+                
+                tdT2Action.appendChild(divT2Act);
+                tr.appendChild(tdT2Action);
+
+                const tdAnnual = document.createElement('td');
+                tdAnnual.style.textAlign = 'center';
+                tdAnnual.appendChild(createGradeSpan(student.annual_grade));
+                tr.appendChild(tdAnnual);
+
+                const tdAnnualAction = document.createElement('td');
+                const divAnnAct = document.createElement('div');
+                divAnnAct.className = 'action-cell-wrapper';
+                
+                const lblAnn = document.createElement('div');
+                lblAnn.className = 'mini-label';
+                lblAnn.textContent = 'Годишна:';
+                divAnnAct.appendChild(lblAnn);
+                divAnnAct.appendChild(createGradeButtonsGroup(student.id, 0, 'годишна'));
+                
+                tdAnnualAction.appendChild(divAnnAct);
+                tr.appendChild(tdAnnualAction);
 
                 tbody.appendChild(tr);
             });
-
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding: 20px;">Мрежова грешка при връзка със сървъра.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:red; padding:20px;">Възникна грешка при зареждане.</td></tr>`;
         }
     }
 
-    async function addGrade(studentId, gradeValue, term) {
+    async function addGrade(studentId, gradeValue, term, gradeType) {
         try {
-            const response = await fetch('/teacher/grades/add', {
+            const response = await fetch('/grades', {
                 method: 'POST',
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
+                headers: { 
+                    'Authorization': token, 
+                    'Content-Type': 'application/json' 
                 },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    grade: gradeValue,
-                    term: term
+                body: JSON.stringify({ 
+                    student_id: studentId, 
+                    grade: gradeValue, 
+                    term: term, 
+                    type: gradeType 
                 })
             });
-
             if (response.ok) {
                 fetchAndRenderStudents();
             } else {
-                alert("Неуспешно добавяне на оценка.");
+                const errData = await response.json();
+                alert("Грешка от сървъра: " + (errData.error || "Неуспешно добавяне"));
             }
-        } catch (error) {
-            alert("Грешка при връзката със сървъра.");
+        } catch (error) { 
+            console.error("Мрежова грешка:", error); 
         }
     }
+
+    window.deleteGrade = async function(gradeId) {
+        if (!confirm('Сигурни ли сте, че искате да изтриете тази оценка?')) return;
+        try {
+            const response = await fetch(`/grades/${gradeId}`, { 
+                method: 'DELETE', 
+                headers: { 'Authorization': token } 
+            });
+            if (response.ok) {
+                fetchAndRenderStudents();
+            } else {
+                alert("Грешка при изтриване на оценката.");
+            }
+        } catch (error) { console.error(error); }
+    };
 
     loadClasses();
 });

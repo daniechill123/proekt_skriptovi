@@ -45,118 +45,115 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 buildOptions(addSub); buildOptions(editSub);
             }
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     async function loadUsers() {
         try {
-            const response = await fetch('/users', { headers: { 'Authorization': token } });
+            const response = await fetch('/users', {
+                method: 'GET',
+                headers: { 'Authorization': token }
+            });
+            if (!response.ok) return;
             allUsers = await response.json();
-            renderTable(allUsers);
-        } catch (error) {
-            console.error(error);
-        }
+            renderUsers(allUsers);
+        } catch (error) { console.error(error); }
     }
 
-    function renderTable(usersList) {
+    function renderUsers(usersList) {
         const tbody = document.getElementById('users-table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
 
         usersList.forEach(user => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>${user.details || '-'}</td>
-                <td>
-                    <span class="edit-btn" style="cursor:pointer; margin-right:1rem; font-size:1.2rem;">✏️</span>
-                    <span class="delete-btn" style="cursor:pointer; font-size:1.2rem;">🗑️</span>
-                </td>
-            `;
 
-            tr.querySelector('.edit-btn').addEventListener('click', () => {
-                window.openEditModal(user.id, user.name, user.email, user.role, user.class_id, user.subject_id);
-            });
+            const tdName = document.createElement('td');
+            tdName.textContent = user.name;
+            tr.appendChild(tdName);
 
-            tr.querySelector('.delete-btn').addEventListener('click', () => {
-                window.deleteUser(user.id);
-            });
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = user.email;
+            tr.appendChild(tdEmail);
 
+            const tdRole = document.createElement('td');
+            tdRole.textContent = user.role;
+            tr.appendChild(tdRole);
+
+            const tdDetails = document.createElement('td');
+            if (user.role === 'Ученик') {
+                tdDetails.textContent = user.class_info ? `Клас: ${user.class_info}` : 'Няма клас';
+            } else if (user.role === 'Учител') {
+                tdDetails.textContent = user.subject_info ? `Предмет: ${user.subject_info}` : 'Няма предмет';
+            } else {
+                tdDetails.textContent = '-';
+            }
+            tr.appendChild(tdDetails);
+
+            const tdActions = document.createElement('td');
+            tdActions.style.textAlign = 'center';
+            
+            const editBtn = document.createElement('span');
+            editBtn.textContent = '✏️';
+            editBtn.style.cursor = 'pointer';
+            editBtn.style.fontSize = '1.2rem';
+            editBtn.style.marginRight = '15px';
+            editBtn.addEventListener('click', () => openEditModal(user));
+            tdActions.appendChild(editBtn);
+
+            const delBtn = document.createElement('span');
+            delBtn.textContent = '🗑️';
+            delBtn.style.cursor = 'pointer';
+            delBtn.style.fontSize = '1.2rem';
+            delBtn.addEventListener('click', () => deleteUser(user.id));
+            tdActions.appendChild(delBtn);
+
+            tr.appendChild(tdActions);
             tbody.appendChild(tr);
         });
     }
 
-    window.openEditModal = function(id, currentName, currentEmail, currentRole, currentClassId, currentSubjectId) {
-        if (!editModal) return;
-        
-        document.getElementById('edit-user-id').value = id;
-        document.getElementById('edit-user-name').value = currentName;
-        document.getElementById('edit-user-email').value = currentEmail;
-        document.getElementById('edit-user-password').value = '';
-        
-        const classGroup = document.getElementById('edit-class-group');
-        const subjectGroup = document.getElementById('edit-subject-group');
-        
-        if (currentRole === 'Ученик') {
-            if (classGroup) classGroup.style.display = 'block';
-            if (subjectGroup) subjectGroup.style.display = 'none';
-            if (document.getElementById('edit-user-class')) document.getElementById('edit-user-class').value = currentClassId || '';
-        } else if (currentRole === 'Учител') {
-            if (classGroup) classGroup.style.display = 'none';
-            if (subjectGroup) subjectGroup.style.display = 'block';
-            if (document.getElementById('edit-user-subject')) document.getElementById('edit-user-subject').value = currentSubjectId || '';
-        } else {
-            if (classGroup) classGroup.style.display = 'none';
-            if (subjectGroup) subjectGroup.style.display = 'none';
-        }
-        
-        editModal.style.display = 'flex';
-    };
-
-    if (addRoleSelect) {
-        addRoleSelect.addEventListener('change', (e) => {
-            const addClassGroup = document.getElementById('add-class-group');
-            const addSubjectGroup = document.getElementById('add-subject-group');
-            if (e.target.value === 'Ученик') {
-                if (addClassGroup) addClassGroup.style.display = 'block';
-                if (addSubjectGroup) addSubjectGroup.style.display = 'none';
-            } else if (e.target.value === 'Учител') {
-                if (addClassGroup) addClassGroup.style.display = 'none';
-                if (addSubjectGroup) addSubjectGroup.style.display = 'block';
-            } else {
-                if (addClassGroup) addClassGroup.style.display = 'none';
-                if (addSubjectGroup) addSubjectGroup.style.display = 'none';
-            }
-        });
-    }
-
-    document.getElementById('close-modal-btn')?.addEventListener('click', () => editModal.style.display = 'none');
-    document.getElementById('open-add-modal-btn')?.addEventListener('click', () => addModal.style.display = 'flex');
-    document.getElementById('close-add-modal-btn')?.addEventListener('click', () => addModal.style.display = 'none');
-
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = allUsers.filter(u => 
-                u.name.toLowerCase().includes(searchTerm) || u.email.toLowerCase().includes(searchTerm)
-            );
-            renderTable(filtered);
-        });
-    }
-
-    window.deleteUser = async (id) => {
+    async function deleteUser(id) {
         if (!confirm("Сигурни ли сте, че искате да изтриете този потребител?")) return;
         try {
-            const res = await fetch(`/users/${id}`, { method: 'DELETE', headers: { 'Authorization': token } });
-            if (res.ok) loadUsers();
-            else alert("Грешка при изтриването!");
+            const response = await fetch(`/users/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': token }
+            });
+            if (response.ok) {
+                loadUsers();
+            } else {
+                const err = await response.json();
+                alert(err.error || "Грешка при изтриване.");
+            }
         } catch (error) { console.error(error); }
-    };
+    }
+
+    function openEditModal(user) {
+        document.getElementById('edit-user-id').value = user.id;
+        document.getElementById('edit-user-name').value = user.name;
+        document.getElementById('edit-user-email').value = user.email;
+        document.getElementById('edit-user-password').value = '';
+
+        const clsGroup = document.getElementById('edit-class-group');
+        const subGroup = document.getElementById('edit-subject-group');
+
+        if (clsGroup) clsGroup.style.display = (user.role === 'Ученик') ? 'block' : 'none';
+        if (subGroup) subGroup.style.display = (user.role === 'Учител') ? 'block' : 'none';
+
+        if (user.role === 'Ученик' && document.getElementById('edit-user-class')) {
+            document.getElementById('edit-user-class').value = user.class_id || '';
+        }
+        if (user.role === 'Учител' && document.getElementById('edit-user-subject')) {
+            document.getElementById('edit-user-subject').value = user.subject_id || '';
+        }
+
+        editModal.style.display = 'flex';
+    }
+
+    document.getElementById('close-modal-btn')?.addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
 
     document.getElementById('save-modal-btn')?.addEventListener('click', async () => {
         const id = document.getElementById('edit-user-id').value;
@@ -166,23 +163,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const classId = document.getElementById('edit-user-class')?.value;
         const subjectId = document.getElementById('edit-user-subject')?.value;
 
-        const updateData = { 
-            name, email,
-            class_id: classId ? parseInt(classId) : null,
-            subject_id: subjectId ? parseInt(subjectId) : null
-        };
-        if (password && password.trim() !== '') updateData.password = password.trim();
+        const payload = { name, email };
+        if (password) payload.password = password;
+
+        payload.class_id = classId ? parseInt(classId) : null;
+        payload.subject_id = subjectId ? parseInt(subjectId) : null;
 
         try {
             const res = await fetch(`/users/${id}`, {
-                method: 'PATCH',
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify(updateData)
+                body: JSON.stringify(payload)
             });
-            if (res.ok) { editModal.style.display = 'none'; loadUsers(); }
-            else { const err = await res.json(); alert(err.error || "Грешка."); }
+            if (res.ok) {
+                editModal.style.display = 'none';
+                loadUsers();
+            } else { const err = await res.json(); alert(err.error || "Грешка."); }
         } catch (e) { console.error(e); }
     });
+
+    document.getElementById('open-add-modal-btn')?.addEventListener('click', () => {
+        document.getElementById('add-user-form').reset();
+        if (addRoleSelect) addRoleSelect.value = 'Ученик';
+        toggleAddFields('Ученик');
+        addModal.style.display = 'flex';
+    });
+
+    document.getElementById('close-add-modal-btn')?.addEventListener('click', () => {
+        addModal.style.display = 'none';
+    });
+
+    addRoleSelect?.addEventListener('change', (e) => {
+        toggleAddFields(e.target.value);
+    });
+
+    function toggleAddFields(role) {
+        const clsGroup = document.getElementById('add-class-group');
+        const subGroup = document.getElementById('add-subject-group');
+        if (clsGroup) clsGroup.style.display = (role === 'Ученик') ? 'block' : 'none';
+        if (subGroup) subGroup.style.display = (role === 'Учител') ? 'block' : 'none';
+    }
 
     document.getElementById('add-user-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -211,6 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadUsers();
             } else { const err = await res.json(); alert(err.error || "Грешка."); }
         } catch (error) { console.error(error); }
+    });
+
+    const searchInput = document.getElementById('search-input');
+    searchInput?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+            renderUsers(allUsers);
+            return;
+        }
+        const filtered = allUsers.filter(u => 
+            u.name.toLowerCase().includes(query) || 
+            u.email.toLowerCase().includes(query)
+        );
+        renderUsers(filtered);
     });
 
     populateDropdowns(token);

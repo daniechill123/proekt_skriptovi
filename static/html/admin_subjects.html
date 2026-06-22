@@ -2,78 +2,133 @@
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ - Предмети</title>
-    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        body { background-color: #f9f9f9; background-image: none; margin: 0; font-family: sans-serif; }
-        .admin-header { text-align: center; font-size: 2.5rem; margin-top: 2rem; }
-        .admin-nav { display: flex; justify-content: center; gap: 20px; margin: 2rem 0; }
-        .admin-nav-btn { padding: 10px 20px; font-size: 1.2rem; cursor: pointer; border: 2px solid #000; background: #fff; }
-        .admin-nav-btn.active { font-weight: bold; }
-        .controls-container { display: flex; justify-content: flex-end; width: 90%; margin: 0 auto 10px auto; }
-        .add-btn { padding: 10px; font-size: 1rem; border: 2px solid #000; background: #fff; cursor: pointer; }
-        .data-table { width: 90%; margin: 0 auto; border-collapse: collapse; text-align: center; background: #fff; border: 2px solid #000; }
-        .data-table th, .data-table td { border: 2px solid #000; padding: 15px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: #fff; padding: 2rem; border-radius: 5px; width: 300px; display: flex; flex-direction: column; gap: 15px; }
+        body.admin-page-body {
+            background-color: #f9f9f9 !important;
+            background-image: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            align-items: stretch !important;
+            font-family: sans-serif !important;
+        }
+        .admin-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            padding-bottom: 100px;
+        }
+        .admin-header {
+            text-align: center !important;
+            margin-top: 2rem !important;
+            margin-bottom: 0 !important;
+        }
+        .admin-header h1 {
+            margin: 0 !important;
+            font-size: 2.5rem !important;
+        }
     </style>
 </head>
-<body>
+<body class="admin-page-body">
+    <div class="admin-layout">
+        <header class="admin-header">
+            <h1>ADMIN</h1>
+        </header>
 
-    <h1 class="admin-header">ADMIN</h1>
+        <nav class="admin-nav">
+            <button class="admin-nav-btn" onclick="window.location.href='/admin/users'">Потребители</button>
+            <button class="admin-nav-btn" onclick="window.location.href='/admin/classes'">Класове</button>
+            <button class="admin-nav-btn active" onclick="window.location.href='/admin/subjects'">Предмети</button>
+        </nav>
 
-    <nav class="admin-nav">
-        <button class="admin-nav-btn" onclick="window.location.href='/admin/users'">Потребители</button>
-        <button class="admin-nav-btn" onclick="window.location.href='/admin/classes'">Класове</button>
-        <button class="admin-nav-btn active" onclick="window.location.href='/admin/subjects'">Предмети</button>
-    </nav>
-
-    <div class="controls-container">
-        <button class="add-btn" id="open-add-modal-btn">+ Добавяне на нов предмет</button>
-    </div>
-
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Предмет</th>
-                <th>Преподавател</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody id="subjects-table-body">
-            </tbody>
-    </table>
-
-    <div class="modal" id="add-modal">
-        <form class="modal-content" id="add-subject-form">
-            <h2>Добави предмет</h2>
-            <label>Име на предмет:</label>
-            <input type="text" id="add-subject-name" required>
-            <label>Преподавател:</label>
-            <select id="add-subject-teacher">
-                <option value="">Без преподавател</option>
-            </select>
-            <div style="display:flex; gap:10px;">
-                <button type="button" id="close-add-modal-btn">Отказ</button>
-                <button type="submit" style="background:#4CAF50; color:white;">Запази</button>
+        <div class="admin-toolbar">
+            <div class="search-group">
+                <label for="search-input">Търсене по име на предмет</label>
+                <input type="text" id="search-input" style="padding:0.4rem; border-radius:0.25rem; font-size:1rem; border:1px solid #ccc;">
             </div>
-        </form>
+            <div class="add-action-group">
+                <button id="open-add-modal-btn" class="btn-add-profile">+ Добавяне на нов предмет</button>
+            </div>
+        </div>
+
+        <main class="admin-main-content">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Преподавател</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="subjects-table-body">
+                </tbody>
+            </table>
+        </main>
     </div>
 
-    <div class="modal" id="edit-modal">
-        <div class="modal-content">
-            <h2>Редактирай предмет</h2>
+    <div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Редактирай предмет</h3>
+            
             <input type="hidden" id="edit-subject-id">
-            <label>Име на предмет:</label>
-            <input type="text" id="edit-subject-name">
-            <label>Преподавател:</label>
-            <select id="edit-subject-teacher">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име на предмет:</label>
+            <input type="text" id="edit-subject-name" style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+            
+            <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Преподавател:</label>
+            <select id="edit-subject-teacher" style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
                 <option value="">Без преподавател</option>
             </select>
-            <div style="display:flex; gap:10px;">
-                <button id="close-edit-modal-btn">Отказ</button>
-                <button id="save-edit-btn" style="background:#4CAF50; color:white;">Запази промените</button>
+            
+            <div style="text-align:right;">
+                <button id="close-edit-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                <button id="save-edit-btn" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Запази промените</button>
             </div>
+        </div>
+    </div>
+
+    <div id="add-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:2rem; border-radius:0.5rem; width:25rem; max-width:90%; box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.3); font-family: sans-serif;">
+            <h3 style="margin-top:0; margin-bottom:1.25rem; color:#333; font-size:1.5rem;">Добави предмет</h3>
+            <form id="add-subject-form">
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Име на предмет:</label>
+                <input type="text" id="add-subject-name" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                
+                <label style="display:block; margin-bottom:0.3rem; font-weight:bold; font-size:1rem;">Преподавател:</label>
+                <select id="add-subject-teacher" style="width:100%; padding:0.5rem; margin-bottom:1.25rem; border:0.06rem solid #ccc; border-radius:0.25rem; box-sizing:border-box; font-size:1rem;">
+                    <option value="">Без преподавател</option>
+                </select>
+                
+                <div style="text-align:right;">
+                    <button type="button" id="close-add-modal-btn" style="background:#ccc; border:none; padding:0.6rem 1rem; border-radius:0.25rem; cursor:pointer; margin-right:0.6rem; font-size:1rem;">Отказ</button>
+                    <button type="submit" style="background:#28a745; color:white; border:none; padding:0.6rem 1.25rem; border-radius:0.25rem; cursor:pointer; font-size:1rem;">Запази</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div class="footer-left">
+            <div class="footer-icon-box">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5.49 12l6.51 3.55 6.51-3.55L12 8.45 5.49 12zm-3.37 3.3l1.86 1.01L12 20.67l7.98-4.35 1.86-1.01V17l-9.84 5.37L2.12 17v-1.7z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="footer-center">
+            <h2>Дневник</h2>
+        </div>
+        <div class="footer-right">
+            <img src="/static/images/logo_footer.png?v=1" alt="Лого" class="footer-logo">
         </div>
     </div>
 
